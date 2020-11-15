@@ -1,9 +1,50 @@
 # dps-lab-1
 Laboratory 1 - Sergio Saco García
 
+## Apartado 1
 
-## 
-### Compilacion sin estandares:	 `gcc -Wall exampleStrings.c`
+A continuación se detallarán todas las reglas y recomendaciones establececidas por el SEI CERT que se incumplen. En primer lugar se indica la línea de código del fichero 'exampleStrings.c' al que pertenece el ejemplo corregido, a continuación la regla o recomendación y por último, el porqué se incumple dicha regla o recomendación y cual es su solución:
+
+### Buffer Overflows and strings
+
+- Línea 41 -> Incumple la regla STR30-C. Do not attempt to modify string literals.
+ + La funcion strrchr se utiliza para modificar el objeto al que apunta 'pathname', dado que el argumento apunta a un string literal el comportamiento es indefinido.
+- Línea 51 -> Incumple la recomendación STR03-C. Do not inadvertently truncate a string.
+ + Uso de la función 'gets()' en lugar de 'fgets()'. 
+- Línea 51 -> Se incumple la regla STR31-C. Guarantee that storage for strings has sufficient space for character data and the null terminator.
+ + La funcion gets() no comprueba el tamaño de los datos leidos, por lo que podria provocar un "buffer overflow". Se debe usar fgets() o gets_s().
+- Línea 67 -> Incumple la recomendación STR05-C. Use pointers to const when referring to string literals.
+ + Declaración de 'char *pointer' sin el uso del modificador 'const'.
+- Líneas 72, 73 y 74 -> Incumple la recomendación STR11-C. Do not specify the bound of a character array initialized with a string literal.
+ + No de debe declarar el tamaño de un array char si se inicializa con un string literal.
+- Líneas 79, 80 y 81 -> Incumple la recomendación STR03-C. Do not inadvertently truncate a string.
+ + Se deben realizar comprobaciones adicionales para asegurarse de que el buffer sea lo suficientemente grande.
+- Líneas 79, 80, 81, 98 y 99 -> Incumple la recomendación STR07-C. Use the bounds-checking interfaces for string manipulation.
+ + Se debeían utilizar las funciones alternativas a las mismas (`strcpy_s(), strcat_s(), strncpy_s(), and strncat_s()`) que permiten comprobar si la operación se puede o no realizar.
+- Línea 102 -> Incumple la regla STR30-C. Do not attempt to modify string literals.
+ + Se modifica un string literal
+
+
+### Arrays
+
+- Línea 18 -> Incumple la recomendación ARR02-C. Explicitly specify array bounds, even if implicitly defined by an initializer.
+ + En la declaracion de un array se debe especificar un valor correspondiente con el valor de incializacion.
+- Líneas 72, 73 y 74 -> Incumple la recomendación ARR02-C. Explicitly specify array bounds, even if implicitly defined by an initializer.
+ + Esta recomendacion tiene una excepcion; ARR02-C-EX1: STR11-C. Do not specify the bound of a character array initialized with a string literal. Por lo que no es necesario especificar dicho valor cuando se inicializa el array con un string literal.
+- Línea 72 -> Incumple la recomendacion ARR02-C. Explicitly specify array bounds, even if implicitly defined by an initializer.
+ + Aparte de que no necesario especificar este valor, este no se corresponde con el tamaño del string literal, por lo que de nuevo, se estaría incumpliendo esta recomendación.
+
+### Miscellaneous
+
+- Línea 51 -> Incumple la regla MSC24-C. Do not use deprecated or obsolescent functions.
+ + La función 'gets()' en el estandar c99 se encuentra en estado 'deprecated'.
+
+
+## Apartado 2
+
+A continuación se mostrará la salida de pantalla obtenida en consola al compilar el fichero fuente dependiendo del compilador y estandar utilizado, así como un ánalisis de estos mensajes, en los cuales se detallan las diferencias que existen entre los mismos.
+
+### Compilacion sin estandares:	 `$gcc -Wall exampleStrings.c`
 
 ```
 exampleStrings.c: In function ‘gets_example_func’:
@@ -33,7 +74,7 @@ exampleStrings.c:(.text+0xd8): aviso: the ‘gets’ function is dangerous and s
 ```
 
  
-### Compilacion con estandar c11:  `gcc -Wall exampleStrings.c -std=c11`
+### Compilacion con estandar c11:  `$gcc -Wall exampleStrings.c -std=c11`
 
 ```
 exampleStrings.c:22:19: warning: missing terminating " character
@@ -85,7 +126,7 @@ exampleStrings.c:68:9: warning: unused variable ‘size_array1’ [-Wunused-vari
 
 
 
-### Compilacion con estandar c99:  `gcc -Wall exampleStrings.c -std=c99`
+### Compilacion con estandar c99:  `$gcc -Wall exampleStrings.c -std=c99`
 
 ```
 exampleStrings.c:22:19: warning: missing terminating " character
@@ -140,7 +181,7 @@ exampleStrings.c:68:9: warning: unused variable ‘size_array1’ [-Wunused-vari
 
 
 
-### Compilacion con g++:  `g++ -Wall exampleStrings.c`
+### Compilacion con g++:  `$g++ -Wall exampleStrings.c`
 
 ```
 exampleStrings.c: In function ‘void gets_example_func()’:
@@ -187,7 +228,7 @@ En el segundo ejemplo (gcc -Wall exampleStrings.c -std=c11), se muestran una may
 - El resto de 'warnings' son los mismos que el primer ejemplo.
 
 En el tercer ejemplo (gcc -Wall exampleStrings.c -std=c99) muestra los mismos 'warning' y errores que el segundo ejemplo, a diferecia de que.
-- En este entandar el 'warning' sobre la función 'gets()' no hace referencia a que no es recomendad, si no que para este estandar, esta función ya se encuentra en estado 'deprecated'.
+- En este entandar el 'warning' sobre la función 'gets()' no hace referencia a que no es recomendada, si no que para este estandar, esta función ya se encuentra en estado 'deprecated'.
 
 Por último, el cuarto ejemplo (g++ -Wall exampleStrings.c), en el cual se utiliza el comando g++ para realizar la compilacion se obtiene lo siguiente:
 - Los mismos avisos que en el primer ejemplo.
